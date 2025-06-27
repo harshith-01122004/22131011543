@@ -1,16 +1,13 @@
-const fs = require('fs');
-const path = require('path');
+import axios from 'axios';
 
-const logStream = fs.createWriteStream(path.join(__dirname, 'app.log'), { flags: 'a' });
-
-function logMiddleware(req, res, next) {
-    const start = Date.now();
-    res.on('finish', () => {
-        const duration = Date.now() - start;
-        const logEntry = `${new Date().toISOString()} | ${req.method} ${req.url} | ${res.statusCode} | ${duration}ms\n`;
-        logStream.write(logEntry);
+export const logAction = async (action, details) => {
+  try {
+    await axios.post('http://localhost:3000/api/logs', {
+      action,
+      details,
+      timestamp: new Date().toISOString(),
     });
-    next();
-}
-
-module.exports = logMiddleware;
+  } catch (error) {
+    // Handle silently or show in UI, but do NOT use console.log
+  }
+};
